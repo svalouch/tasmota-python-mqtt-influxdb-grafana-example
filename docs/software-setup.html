@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Software Setup &#8212; tasmota-python-mqtt-influxdb-grafana-example  documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Components" href="components.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="components.html" title="Components"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tasmota-python-mqtt-influxdb-grafana-example  documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="software-setup">
+<h1>Software Setup<a class="headerlink" href="#software-setup" title="Permalink to this headline">¶</a></h1>
+<p>Depending on your distribution of choice, getting the software can be a challenge. Some popular distributions are
+listed below:</p>
+<div class="section" id="influxdb">
+<h2>InfluxDB<a class="headerlink" href="#influxdb" title="Permalink to this headline">¶</a></h2>
+<p>There is no real version-specific feature in use, most versions of InfluxDB will work.</p>
+<div class="section" id="installing">
+<h3>Installing<a class="headerlink" href="#installing" title="Permalink to this headline">¶</a></h3>
+<p>First, check if your distribution already provides the neccessary package. It is usually called <code class="docutils literal notranslate"><span class="pre">influxdb</span></code>.</p>
+<ul class="simple">
+<li><p>Arch packages it in <code class="docutils literal notranslate"><span class="pre">community/influxdb</span></code>: <code class="docutils literal notranslate"><span class="pre">pacman</span> <span class="pre">-S</span> <span class="pre">influxdb</span></code>.</p></li>
+<li><p>Debian includes <code class="docutils literal notranslate"><span class="pre">influxdb</span></code> since <cite>Stretch</cite>, just use this using <code class="docutils literal notranslate"><span class="pre">apt</span> <span class="pre">install</span> <span class="pre">influxdb</span></code>.</p></li>
+<li><p>Gentoo has it included in <code class="docutils literal notranslate"><span class="pre">~arch</span></code>. Unmask the package and <code class="docutils literal notranslate"><span class="pre">emerge</span> <span class="pre">dev-db/influxdb</span></code>.</p></li>
+<li><p>Ubuntu and Ubuntu-based such as Mint, RHEL and RHEL-based such as CentOS: Use the vendor repositories at
+<a class="reference external" href="https://docs.influxdata.com/influxdb/v1.7/introduction/installation#installing-influxdb-oss">https://docs.influxdata.com/influxdb/v1.7/introduction/installation#installing-influxdb-oss</a>.</p></li>
+</ul>
+<p>With the database installed, start it (if it is not auto-started) using <code class="docutils literal notranslate"><span class="pre">systemctl</span> <span class="pre">start</span> <span class="pre">influxdb.serive</span></code> for
+systemd-based distributions or <code class="docutils literal notranslate"><span class="pre">/etc/init.d/influxdb</span> <span class="pre">start</span></code> for SysVInit and OpenRC.</p>
+</div>
+<div class="section" id="setup">
+<h3>Setup<a class="headerlink" href="#setup" title="Permalink to this headline">¶</a></h3>
+<p>The main config file is usually found at <code class="docutils literal notranslate"><span class="pre">/etc/influxd.conf</span></code> and is an <cite>ini</cite> file. The database listens on port
+<code class="docutils literal notranslate"><span class="pre">8086</span></code> on <code class="docutils literal notranslate"><span class="pre">localhost</span></code> by default, which is sufficient for this guide.</p>
+<p>Connect to it using the client program supplied with it and create the database <code class="docutils literal notranslate"><span class="pre">tasmota</span></code>:</p>
+<div class="highlight-shell-session notranslate"><div class="highlight"><pre><span></span><span class="gp">$</span> influx
+<span class="go">Connected to http://localhost:8086 version 1.6.1</span>
+<span class="go">InfluxDB shell version: 1.6.1</span>
+<span class="gp">&gt;</span> create database tasmota
+<span class="gp">&gt;</span> quit
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="mosquitto">
+<h2>Mosquitto<a class="headerlink" href="#mosquitto" title="Permalink to this headline">¶</a></h2>
+<p>All major distributions have <code class="docutils literal notranslate"><span class="pre">mosquitto</span></code> packaged. No special features are required by this guide, so any version
+included in a distribution that still receives support should suffice.</p>
+<p>The main configuration file can usually be found at <code class="docutils literal notranslate"><span class="pre">/etc/mosquitto/mosquitto.conf</span></code>. The default config should
+suffice, though it by default listens on all interfaces, so restricting it via <code class="docutils literal notranslate"><span class="pre">bind_address</span></code> is highly recommended.</p>
+<p>The daemon listens on port <code class="docutils literal notranslate"><span class="pre">1883</span></code> by default.</p>
+</div>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<p>Python should be provided by your distribution of choice. For obvious reasons, the guide does not care for Python 2.
+The minimum Python version the code is tested with is Python 3.6, but it should work on 3.5 (Debian Stretch), too.</p>
+<div class="section" id="required-packages">
+<h3>Required packages<a class="headerlink" href="#required-packages" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">influxdb</span></code> for interfacing with InfluxDB. It handles many of the specialties, though one could also use the API
+directly using <cite>requests</cite>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">paho-mqtt</span></code> for working with the MQTT broker.</p></li>
+</ul>
+</div>
+<div class="section" id="mqtt">
+<h3>MQTT<a class="headerlink" href="#mqtt" title="Permalink to this headline">¶</a></h3>
+<p>In order to connect to the MQTT broker and to subscribe, we’ll use the <code class="docutils literal notranslate"><span class="pre">paho-mqtt</span></code> library and some callbacks. The
+general way this library works is:</p>
+<ol class="arabic simple">
+<li><p>Create an instance of the client</p></li>
+<li><p>Set up the <code class="docutils literal notranslate"><span class="pre">on_connect</span></code> callback. It is called uppon successful connection. The callback will subscribe to the
+interesting topics, as this information is not persistent.</p></li>
+<li><p>Set up the <code class="docutils literal notranslate"><span class="pre">on_message</span></code> callback that is called for every message in any subscribed topic.</p></li>
+<li><p>Connect using <code class="docutils literal notranslate"><span class="pre">connect()</span></code>.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">loop_forever()</span></code>, this will never return and from now on everything is managed by the MQTT library. It will
+call the previously set callbacks.</p></li>
+</ol>
+<p>In code, it looks like the following:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">paho.mqtt.client</span> <span class="k">as</span> <span class="nn">paho</span>
+
+<span class="c1"># this is the on_connect callback method</span>
+<span class="k">def</span> <span class="nf">cb_on_connect</span><span class="p">(</span><span class="n">mqtt</span><span class="p">,</span> <span class="n">userdata</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">rc</span><span class="p">):</span>
+    <span class="n">mqttc</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="s1">&#39;tele/+/SENSOR&#39;</span><span class="p">)</span>
+    <span class="c1"># subscribe to other topics</span>
+
+<span class="c1"># this is the on_message callback method</span>
+<span class="k">def</span> <span class="nf">cb_on_message</span><span class="p">(</span><span class="n">mqtt</span><span class="p">,</span> <span class="n">userdata</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Topic: </span><span class="si">{0}</span><span class="s1"> | Message: </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">topic</span><span class="p">,</span> <span class="n">msg</span><span class="o">.</span><span class="n">payload</span><span class="p">))</span>
+    <span class="c1"># work with the data</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">mqttc</span>  <span class="c1"># bad style, but enough for the example</span>
+
+    <span class="c1"># create a client instance with a &quot;client id&quot; (like a user agent). clean_session means that we don&#39;t care for</span>
+    <span class="c1"># stored messages (concern of QoS &gt; 0).</span>
+    <span class="n">mqttc</span> <span class="o">=</span> <span class="n">paho</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="s1">&#39;python-test-0.1&#39;</span><span class="p">,</span> <span class="n">clean_session</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">mqttc</span><span class="o">.</span><span class="n">on_connect</span> <span class="o">=</span> <span class="n">cb_on_connect</span>
+    <span class="n">mqttc</span><span class="o">.</span><span class="n">on_message</span> <span class="o">=</span> <span class="n">cb_on_message</span>
+
+    <span class="c1"># connect to the broker on localhost with a 60 seconds timeout</span>
+    <span class="n">mqttc</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">1883</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="c1"># enter the endless loop</span>
+    <span class="n">mqttc</span><span class="o">.</span><span class="n">loop_forever</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>InfluxDB<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">influxdb</span></code> package provides a nice interface. One important bit especially with Grafana is the use of the
+correct time precision. By default, points are stored with a nano-second precision which causes Grafana to fail to
+display a continous line. Tasmota usually sends messages every few minutes, so a minute precision is perfect for us.</p>
+<ol class="arabic simple">
+<li><p>Create an instance of the client. The instance is bound to a database (that has to exist prior to writing data)</p></li>
+<li><p>Write data</p></li>
+</ol>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">influxdb</span> <span class="kn">import</span> <span class="n">InfluxDBClient</span>
+
+<span class="c1"># precision is in minutes as stated above</span>
+<span class="n">time_precision</span> <span class="o">=</span> <span class="s1">&#39;m&#39;</span>
+
+<span class="c1"># Create a client instance. admin/admin are dummy-credentials unless the database is configured for authentication</span>
+<span class="n">influxc</span> <span class="o">=</span> <span class="n">InfluxDBClient</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="mi">8086</span><span class="p">,</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;tasmota&#39;</span><span class="p">)</span>
+
+<span class="c1"># assemble one data point (the interface can work with many points at the same time, though)</span>
+<span class="n">points</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;measurement&#39;</span><span class="p">:</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;host&#39;</span><span class="p">:</span> <span class="s1">&#39;sonoff-pow-r1&#39;</span><span class="p">},</span> <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;testtemperature&#39;</span><span class="p">:</span> <span class="mf">21.0</span><span class="p">})</span>
+<span class="c1"># write the datapoint</span>
+<span class="n">influxc</span><span class="o">.</span><span class="n">write_points</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">points</span><span class="p">,</span> <span class="n">time_precision</span><span class="o">=</span><span class="n">time_precision</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>That’s basically it.</p>
+</div>
+</div>
+<div class="section" id="grafana">
+<h2>Grafana<a class="headerlink" href="#grafana" title="Permalink to this headline">¶</a></h2>
+<p>Grafana is packaged by some distributions:</p>
+<ul class="simple">
+<li><p>Arch has <code class="docutils literal notranslate"><span class="pre">community/grafana</span></code>, install using <code class="docutils literal notranslate"><span class="pre">pacman</span> <span class="pre">-S</span> <span class="pre">grafana</span></code>.</p></li>
+<li><p>Gentoo has <code class="docutils literal notranslate"><span class="pre">www-apps/grafana-bin</span></code>, unmask it and <code class="docutils literal notranslate"><span class="pre">emerge</span> <span class="pre">grafana-bin</span></code>.</p></li>
+</ul>
+<p>For most of the distributions, relying on the vendor packages is recommended:
+<a class="reference external" href="https://grafana.com/grafana/download">https://grafana.com/grafana/download</a></p>
+<p>Any reasonably recent version should suffice.</p>
+<div class="section" id="id2">
+<h3>Setup<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>After installation, find the config file in <code class="docutils literal notranslate"><span class="pre">/etc/grafana/grafana.ini</span></code> and make a few adjustments. Grafana hosts its
+content on its own and listens on port <code class="docutils literal notranslate"><span class="pre">3000</span></code> by default. Its default credentials are:</p>
+<ul class="simple">
+<li><p>User: <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
+<li><p>Password: <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
+</ul>
+<p>And these should be changed.</p>
+<p>TODO datasource setup
+TODO dashboard setup</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Software Setup</a><ul>
+<li><a class="reference internal" href="#influxdb">InfluxDB</a><ul>
+<li><a class="reference internal" href="#installing">Installing</a></li>
+<li><a class="reference internal" href="#setup">Setup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mosquitto">Mosquitto</a></li>
+<li><a class="reference internal" href="#python">Python</a><ul>
+<li><a class="reference internal" href="#required-packages">Required packages</a></li>
+<li><a class="reference internal" href="#mqtt">MQTT</a></li>
+<li><a class="reference internal" href="#id1">InfluxDB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grafana">Grafana</a><ul>
+<li><a class="reference internal" href="#id2">Setup</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="components.html"
+                        title="previous chapter">Components</a></p>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="components.html" title="Components"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">tasmota-python-mqtt-influxdb-grafana-example  documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, svalouch.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.4.4.
+    </div>
+  </body>
+</html>

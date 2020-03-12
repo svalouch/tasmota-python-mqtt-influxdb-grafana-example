@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Welcome to tasmota-python-mqtt-influxdb-grafana-example’s documentation! &#8212; tasmota-python-mqtt-influxdb-grafana-example  documentation</title>
+    <title>tasmota-python-mqtt-influxdb-grafana-example &#8212; tasmota-python-mqtt-influxdb-grafana-example  documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
@@ -15,7 +15,8 @@
     <script src="_static/language_data.js"></script>
     
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Warnings and Clarifications" href="warnings-and-clarifications.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -23,6 +24,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="warnings-and-clarifications.html" title="Warnings and Clarifications"
+             accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">tasmota-python-mqtt-influxdb-grafana-example  documentation</a> &#187;</li> 
       </ul>
     </div>  
@@ -32,18 +36,38 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-tasmota-python-mqtt-influxdb-grafana-example-s-documentation">
-<h1>Welcome to tasmota-python-mqtt-influxdb-grafana-example’s documentation!<a class="headerlink" href="#welcome-to-tasmota-python-mqtt-influxdb-grafana-example-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="tasmota-python-mqtt-influxdb-grafana-example">
+<h1>tasmota-python-mqtt-influxdb-grafana-example<a class="headerlink" href="#tasmota-python-mqtt-influxdb-grafana-example" title="Permalink to this headline">¶</a></h1>
+<p>This guide provides a starting point for wiring up an IoT-device running <a class="reference external" href="https://tasmota.github.io/docs/">Tasmota</a> to an <a class="reference external" href="https://docs.influxdata.com/influxdb/v1.7/">InfluxDB</a> over <a class="reference external" href="https://mosquitto.org/">MQTT</a> and
+displaying the results in <a class="reference external" href="https://grafana.com/docs/grafana/latest/">Grafana</a>.</p>
+<p>The guide fokuses on measurement data provided by the Tasmota firmware running on a suitable device. That means that
+running this on a device like the <cite>Sonoff S20</cite> will only yield wifi metrics. A <cite>Sonoff POW R2</cite> will export power
+measurements, too, which is of much higher interest in general.</p>
 <div class="toctree-wrapper compound">
-</div>
-</div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="warnings-and-clarifications.html">Warnings and Clarifications</a></li>
+<li class="toctree-l1"><a class="reference internal" href="prerequisites.html">Prerequisites</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="prerequisites.html#a-machine-that-runs-24-7">A machine that runs 24/7</a></li>
+<li class="toctree-l2"><a class="reference internal" href="prerequisites.html#a-tasmota-powered-device">A Tasmota-powered device</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="components.html">Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="components.html#influxdb">InfluxDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#mosquitto-mqtt">Mosquitto / MQTT</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#grafana">Grafana</a></li>
+<li class="toctree-l2"><a class="reference internal" href="components.html#python">Python</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="software-setup.html">Software Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="software-setup.html#influxdb">InfluxDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-setup.html#mosquitto">Mosquitto</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-setup.html#python">Python</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software-setup.html#grafana">Grafana</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 
 
@@ -52,12 +76,9 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="#">Table of Contents</a></h3>
-  <ul>
-<li><a class="reference internal" href="#">Welcome to tasmota-python-mqtt-influxdb-grafana-example’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-
+  <h4>Next topic</h4>
+  <p class="topless"><a href="warnings-and-clarifications.html"
+                        title="next chapter">Warnings and Clarifications</a></p>
 <div id="searchbox" style="display: none" role="search">
   <h3 id="searchlabel">Quick search</h3>
     <div class="searchformwrapper">
@@ -78,6 +99,9 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="warnings-and-clarifications.html" title="Warnings and Clarifications"
+             >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">tasmota-python-mqtt-influxdb-grafana-example  documentation</a> &#187;</li> 
       </ul>
     </div>
