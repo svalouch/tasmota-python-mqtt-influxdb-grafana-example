@@ -50,8 +50,12 @@ else:
 
 # SENSOR topic receives sensorical data, such as energy meter, temperature sensors or ambient sensors.
 TOPIC_SENSOR = 'tele/+/SENSOR'
+# STATE receives operational information such as output/input state, wifi signal strength etc.
 TOPIC_STATE = 'tele/+/STATE'
+# UPTIME receives the current device uptime and is only included for completeness.
 TOPIC_UPTIME = 'tele/+/UPTIME'
+# RESULT receives messages that are generated as a result of another event, such as a button being pressed or settings
+# changed.
 TOPIC_RESULT = 'stat/+/RESULT'
 
 
@@ -117,6 +121,9 @@ def cb_on_message(mqtt, userdata, msg):
         # Tasmota 5.1.12: {"Time":"2018-06-09T16:29:19","ENERGY":{"Total":0.034,"Yesterday":0.000,"Today":0.031,"Period":3,"Power":34,"Factor":0.85,"Voltage":236,"Current":0.170}}
         # Tasmota 8.1.0: {"Time":"2020-02-10T21:29:35","ENERGY":{"TotalStartTime":"2020-02-10T21:00:25","Total":1.310,"Yesterday":0.000,"Today":0.000,"Period":0,"Power":0,"ApparentPower":0,"ReactivePower":0,"Factor":0.00,"Voltage":0,"Current":0.000}}
 
+        # Shelly 1PM on Tasmota 8.1.0:
+        # {"Time":"2020-03-13T11:06:00","Switch1":"OFF","ANALOG":{"Temperature":42.2},"ENERGY":{"TotalStartTime":"2020-03-11T15:21:39","Total":0.680,"Yesterday":0.355,"Today":0.325,"Period":30,"Power":202},"TempUnit":"C"}
+
         # NOTE: This has to be adjusted for the specific fields your Tasmota-device supports.
 
         # extract the payload by means of a json parser. It will raise an exception if the data is invalid.
@@ -133,19 +140,42 @@ def cb_on_message(mqtt, userdata, msg):
 
                 # extract all the fields, providing sensible defaults if missing.
 
-                # we know that the following fields are always sent by the Sonoff POW R2
                 fields['total'] = energy['Total']
                 fields['power'] = energy['Power']
-                fields['factor'] = energy['Factor']
-                fields['voltage'] = energy['Voltage']
-                fields['current'] = energy['Current']
 
-                # The following fields are not sent by all versions of Tasmota on the Sonoff POW R2, so we catch that.
-                fields['period'] = energy['Period'] if ('Period' in energy and energy['Period']) else 0
-                fields['apparent_power'] = energy['ApparentPower'] if 'ApparentPower' in energy else 0.0
-                fields['reactive_power'] = energy['ReactivePower'] if 'ReactivePower' in energy else 0.0
+                # the follwing 3 are reported by a Sonoff POW R2, but not by a Shelly 1PM
+                if 'Factor' in energy:
+                    fields['factor'] = energy['Factor']
+                if 'Voltage' in energy:
+                    fields['voltage'] = energy['Voltage']
+                if 'Current' in energy:
+                    fields['current'] = energy['Current']
 
-                # there are more fields, like "TotalStartTime", "Yesterday" and so on, but we're not interested in them.
+                # Sonoff POW R2: period, apparent power and reactive power is reported at version 8.1.0
+                if 'Period' in energy:
+                    fields['period'] = energy['Period']
+                # Shelly 1PM: not reported
+                if 'ApparentPower' in energy:
+                    fields['apparent_power'] = energy['ApparentPower']
+                if 'ReactivePower' in energy:
+                    fields['reactive_power'] = energy['ReactivePower']
+
+                # There are more fields, like "TotalStartTime", "Yesterday" and so on, but we're not interested in
+                # them as we can calculate them out of the data in the InfluxDB
+
+            elif 'ANALOG' in st:
+                # Data from analog inputs like temperature sensors
+
+                if 'Temperature' in st['ANALOG']:
+                    measurement = 'ambient'
+
+                    if 'TempUnit' in st and st['TempUnit'] == 'F':
+                        fields['temperature'] = (st['ANALOG']['Temperature'] - 32) * 5 / 9
+                    else:
+                        fields['temperature'] = st['ANALOG']['Temperature']
+
+                # Other sensors haven't been observed by the authors yet
+                # elif 'othersensor' in st['ANALOG']:
 
             # elif 'OTHERSENSOR' in st:
             #     # handle other sensor data
@@ -186,6 +216,10 @@ def cb_on_message(mqtt, userdata, msg):
                     fields['wifi_signal'] = wi['Signal']
                 if 'Channel' in wi:
                     fields['wifi_channel'] = wi['Channel']
+                if 'LinkCount' in wi:
+                    fields['wifi_link_count'] = wi['LinkCount']
+                if 'Downtime' in wi:
+                    fields['wifi_downtime'] = uptime_to_seconds(wi['Downtime'])
 
     elif paho.topic_matches_sub(TOPIC_UPTIME, msg.topic):
 
